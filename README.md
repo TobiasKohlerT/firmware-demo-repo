@@ -38,23 +38,25 @@ helm repo add actions-runner-controller https://actions-runner-controller.github
 helm upgrade --install actions-runner-controller actions-runner-controller/actions-runner-controller \
   --namespace actions-runner-system --create-namespace \
   --set=authSecret.create=true \
-  --set=authSecret.github_token="yourGithubToken" \
+  --set=authSecret.github_token="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" \
   --set=runner.statusUpdateHook.enabled=true \
+  --version 0.23.7 \
   --wait
 ```
 
 #### Install Akri for Device Discovery
 
 ```bash
-helm repo add akri-helm-charts https://project-akri.github.io/akri/
-helm install akri akri-helm-charts/akri
+helm repo add akri-helm-charts https://project-akri.github.io/akri/ 
+helm install akri akri-helm-charts/akri --version 0.12.20 -f helm/values/akri/values.yaml
 ```
 
 #### Install InfluxDB2
 
 ```bash
 helm repo add influxdata https://helm.influxdata.com/
-helm upgrade --install influx influxdata/influxdb2 -f ./helm/values/influxdb2/values.yaml
+helm upgrade --install influx influxdata/influxdb2 -f ./helm/values/influxdb2/values.yaml --version 2.1.2
+kubectl port-forward influx-influxdb2-0 8086:8086
 ```
 
 ### Step 2: Create InfluxDB2 API-Token

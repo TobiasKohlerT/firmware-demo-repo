@@ -1,4 +1,7 @@
 name: DeviceGroupCI
+env:
+  WORKSPACE: "./firmware_a"
+  DEVICEGROUP: "device-group"
 
 on:
   push:
@@ -6,11 +9,6 @@ on:
       - main
     paths:
       - 'firmware_a/**'
-  # pull_request:
-  #   branches:
-  #     - main
-  #   paths:
-  #     - 'firmware_a/**'
   workflow_dispatch:
     inputs:
       serialNumber:
@@ -22,11 +20,6 @@ on:
 
 run-name: "${{ github.event.inputs.serialNumber }}"
 
-
-env:
-  WORKSPACE: "./firmware_a"
-  DEVICEGROUP: "device-group"
-  CI_ON_PULL_REQUEST: "true"
 
 jobs:
   # continuous_integration:

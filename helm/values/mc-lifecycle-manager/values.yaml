@@ -8,7 +8,7 @@ tolerations: []
 
 affinity: {}
 
-namespace: "test"
+namespace: "default"
 
 sensors:
   - sensor: "ADXL345"
@@ -40,7 +40,7 @@ deviceGroups:
     label: "label"
     firmwareRepository:
       owner: "TobiasKohlerT"
-      repoName: "datapipeline-operator"
+      repoName: "firmware-demo-repo"
       accessToken: "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"
       workflowName: "DeviceGroupCI"
       workflowFileName: "devicegroup-ci.yaml"
@@ -61,10 +61,10 @@ deviceGroups:
 
 telegraf:
   influxdb:
-    url: "http://influxdb-influxdb2.default.svc.cluster.local:80"
+    url: "http://influx-influxdb2.default.svc.cluster.local:80"
     organization: "influxdata" 
     bucket: "default"
-    token: "mWggXbm3cvaOvg3TVz7S6tbPXoO0LU1AVqnYOHSCz8_vjkk6isJ8Bsrx5ss5a9ZtImXbikG6magaLA_rDXpifw=="
+    token: "Kb2U1J3-YM7oz2yupGkaPw0q_lFvSpHpBSwDqbmuNYzWeFJqImh4H5vIlgN2F3PM_BS_K5wD4KPlZ1Rvq2S2Dw=="
 
 
 cloudMqttBroker:
