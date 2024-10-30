@@ -16,9 +16,7 @@ spec:
     spec:
       repository: TobiasKohlerT/datapipeline-operator
       labels:
-        {{- range .Values.deviceGroups }}
-        - "{{ .deviceGroupName }}"
-        {{- end }}
+        - "devicegroup-runner"
       env:
         - name: RUNNER_FEATURE_FLAG_EPHEMERAL
           value: "true"

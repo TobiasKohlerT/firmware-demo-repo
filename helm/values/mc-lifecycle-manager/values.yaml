@@ -43,7 +43,7 @@ deviceGroups:
       repoName: "firmware-demo-repo"
       accessToken: "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"
       workflowName: "DeviceGroupCI"
-      workflowFileName: "devicegroup-ci.yaml"
+      workflowFileName: "deployment_projecta.yaml"
     devices:
       serialNumbers:
         - "066AFF34314B4E3043073352"

@@ -1,14 +1,14 @@
 name: DeviceGroupCI
 env:
-  WORKSPACE: "./firmware_a"
+  WORKSPACE: "./firmware/project-a"
   DEVICEGROUP: "device-group"
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'firmware_a/**'
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'firmware/project-a/**'
   workflow_dispatch:
     inputs:
       serialNumber:
