@@ -1,0 +1,176 @@
+udev:
+  configuration:
+    # enabled defines whether to load a udev configuration
+    enabled: true
+    # name is the Kubernetes resource name that will be created for this
+    # udev configuration
+    name: akri-udev-test
+    # brokerProperties is a map of properties that will be passed to any instances
+    # created as a result of applying this udev configuration
+    brokerProperties: {}
+    discoveryDetails:
+      # groupRecursive defines whether to group discovered parent/children under the same instance
+      groupRecursive: false
+      # udevRules is the list of udev rules used to find instances created as a result of
+      # applying this udev configuration
+      udevRules: ['KERNEL=="ttyS0"'] 
+      #"ttyUSB01", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", SUBSYSTEM=="tty"']
+    # capacity is the capacity for any instances created as a result of
+    # applying this udev configuration
+    capacity: 2
+    brokerPod:
+      image:
+        # repository is the udev broker sidecar container reference
+        repository: myoung34/github-runner
+        # tag is the udev broker sidecar image tag
+        tag: latest
+        # pullPolicy is the udev broker sidecar pull policy
+        pullPolicy: ""
+      env:
+        ACCESS_TOKEN: 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
+        REPO_URL: https://github.com/TobiasKohlerT/ma-playground
+        RUNNER_NAME: test-runner
+        LABELS: broker-sample
+      # image:
+      #   # repository is the udev broker container reference
+      #   repository: #tobiaskohler/test-broker
+      #   # tag is the udev broker image tag
+      #   tag: v0.2.0
+      #   # pullPolicy is the udev broker pull policy
+      #   pullPolicy: ""
+      resources:
+        # memoryRequest defines the minimum amount of RAM that must be available to this Pod
+        # for it to be scheduled by the Kubernetes Scheduler
+        memoryRequest: 1000Mi
+        # cpuRequest defines the minimum amount of CPU that must be available to this Pod
+        # for it to be scheduled by the Kubernetes Scheduler
+        cpuRequest: 100m
+        # memoryLimit defines the maximum amount of RAM this Pod can consume.
+        memoryLimit: 3000Mi
+        # cpuLimit defines the maximum amount of CPU this Pod can consume.
+        cpuLimit: 290m
+      securityContext: {}
+    brokerPodSidecar:
+      image:
+        # repository is the udev broker container reference
+        repository: tobiaskohler/broker-test-pod
+        # tag is the udev broker image tag
+        tag: latest
+        # pullPolicy is the udev broker pull policy
+        pullPolicy: ""
+      # env:
+      #   ACCESS_TOKEN: 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
+      #   REPO_URL: https://github.com/TobiasKohlerT/ma-playground
+      #   RUNNER_NAME: test-runner
+      #   LABELS: broker-sample
+      resources:
+        # memoryRequest defines the minimum amount of RAM that must be available to this Pod
+        # for it to be scheduled by the Kubernetes Scheduler
+        memoryRequest: 50Mi
+        # cpuRequest defines the minimum amount of CPU that must be available to this Pod
+        # for it to be scheduled by the Kubernetes Scheduler
+        cpuRequest: 10m
+        # memoryLimit defines the maximum amount of RAM this Pod can consume.
+        memoryLimit: 100Mi
+        # cpuLimit defines the maximum amount of CPU this Pod can consume.
+        cpuLimit: 29m
+      securityContext: {}
+    brokerJob: 
+      # container used by udev
+      image:
+        # repository is the udev broker container reference
+        repository: 
+        # tag is the udev broker image tag
+        tag: latest
+        # pullPolicy is the udev pull policy
+        pullPolicy: ""
+      # command to be executed in the Pod. An array of arguments. Can be set like:
+      # --set udev.configuration.brokerJob.command[0]="sh" \
+      # --set udev.configuration.brokerJob.command[1]="-c" \
+      # --set udev.configuration.brokerJob.command[2]="echo 'Hello World'"
+      command:
+      # restartPolicy for the Job. Can either be OnFailure or Never.
+      restartPolicy: OnFailure
+      resources:
+        # memoryRequest defines the minimum amount of RAM that must be available to this Pod
+        # for it to be scheduled by the Kubernetes Scheduler
+        memoryRequest: 10Mi
+        # cpuRequest defines the minimum amount of CPU that must be available to this Pod
+        # for it to be scheduled by the Kubernetes Scheduler
+        cpuRequest: 10m
+        # memoryLimit defines the maximum amount of RAM this Pod can consume.
+        memoryLimit: 30Mi
+        # cpuLimit defines the maximum amount of CPU this Pod can consume.
+        cpuLimit: 29m
+      # backoffLimit defines the Kubernetes Job backoff failure policy. More info:
+      # https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy
+      backoffLimit: 2
+      # parallelism defines how many Pods of a Job should run in parallel. More info:
+      # https://kubernetes.io/docs/concepts/workloads/controllers/job/#parallel-jobs
+      parallelism: 1
+      # completions defines how many Pods of a Job should successfully complete. More info:
+      # https://kubernetes.io/docs/concepts/workloads/controllers/job
+      completions: 1
+    # createInstanceServices is specified if a service should automatically be
+    # created for each broker pod
+    createInstanceServices: true
+    instanceService:
+      # portName is the name of the port
+      portName: grpc
+      # type is the service type of the instance service
+      type: ClusterIP
+      # port is the service port of the instance service
+      port: 80
+      # targetPort is the service targetPort of the instance service
+      targetPort: 8083
+      # protocol is the service protocol of the instance service
+      protocol: TCP
+    # createConfigurationService is specified if a single service should automatically be
+    # created for all broker pods of a Configuration
+    createConfigurationService: true
+    configurationService:
+      # portName is the name of the port
+      portName: grpc
+      # type is the service type of the instance service
+      type: ClusterIP
+      # port is the service port of the instance service
+      port: 80
+      # targetPort is the service targetPort of the instance service
+      targetPort: 8083
+      # protocol is the service protocol of the instance service
+      protocol: TCP
+  # discovery defines a set of values for a udev discovery handler DaemonSet
+  discovery: 
+    # enabled defines whether discovery handler pods will be deployed in a slim Agent scenario
+    enabled: true
+    image:
+      # repository is the container reference
+      repository: ghcr.io/project-akri/akri/udev-discovery
+      # tag is the container tag
+      # udev-configuration.yaml will default to v(AppVersion)[-dev]
+      # with `-dev` added if `useDevelopmentContainers` is specified
+      tag:
+      # pullPolicy is the pull policy
+      pullPolicy: ""
+    # useNetworkConnection specifies whether the discovery handler should make a networked connection
+    # with Agents, using its pod IP address when registering
+    useNetworkConnection: false
+    # port specifies (when useNetworkConnection is true) the port on which the discovery handler advertises its discovery service
+    port: 10000
+    # nodeSelectors is the array of nodeSelectors used to target nodes for the discovery handler to run on
+    # This can be set from the helm command line using `--set udev.discovery.nodeSelectors.label="value"`
+    nodeSelectors: {}
+    host: 
+      # udev is the node path of udev, usually at `/run/udev`
+      udev: /run/udev
+    resources:
+      # memoryRequest defines the minimum amount of RAM that must be available to this Pod
+      # for it to be scheduled by the Kubernetes Scheduler
+      memoryRequest: 11Mi
+      # cpuRequest defines the minimum amount of CPU that must be available to this Pod
+      # for it to be scheduled by the Kubernetes Scheduler
+      cpuRequest: 10m
+      # memoryLimit defines the maximum amount of RAM this Pod can consume.
+      memoryLimit: 24Mi
+      # cpuLimit defines the maximum amount of CPU this Pod can consume.
+      cpuLimit: 24m

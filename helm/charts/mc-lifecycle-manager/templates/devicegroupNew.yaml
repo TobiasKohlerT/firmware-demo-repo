@@ -1,0 +1,105 @@
+
+# apiVersion: datapipeline.datapipeline.io/v1
+# kind: DeviceGroup
+# metadata:
+#   name: device-group
+# spec:
+#   deviceName: "name"
+#   label: "label"
+#   deviceType: "type"
+#   firmwareRepository:
+#     owner: "owner"
+#     repoName: "username:password"
+#     accessToken: "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"
+#   devices:
+#     serialNumbers:
+#       - "KERNEL==\"ttyACM0\""
+#     microcontrollerSpec:
+#       vendorId: "2a03" #"KERNEL==\"ttyS0\", KERNEL==\"ttyS1\"" #"vendorId"
+#       productId: "0043" #"productId"
+#       baudRate: 9600
+#       topic: "topic"
+#       sensors:
+#         - sensor: "ADXL345"
+#           type: "accelerometer"
+#           unit: "m/s^2"
+#           id: 1
+#           fields:
+#             - name: "x"
+#               type: int16
+#             - name: "y"
+#               type: int16
+#             - name: "z"
+#               type: int16
+  # discoveryDetails:
+  #   node: "node"
+  #   udevRule: ["KERNEL==\"ttyS1\""]
+  # dataEndpoint:
+  #   dataPipeline: "data-pipeline"
+  #   mqttHost: "mosquitto"
+{{- range .Values.deviceGroups }}
+apiVersion: datapipeline.datapipeline.io/v1
+kind: DeviceGroup
+metadata:
+  name: {{ .deviceGroupName | lower }}
+  namespace: {{ $.Values.namespace }}
+spec:
+  deviceInfo:
+    name: {{ .devices.microcontrollerSpec.deviceName }}
+    label: {{ .label }}
+    vendorId: "{{ .devices.microcontrollerSpec.vendorId }}"
+    productId: "{{ .devices.microcontrollerSpec.productId }}"
+  firmwareRepository:
+    owner: {{ .firmwareRepository.owner }}
+    repo:  {{ .firmwareRepository.repoName }}
+    accessToken: {{ .firmwareRepository.accessToken }}
+    workflowName: {{ .firmwareRepository.workflowName }}
+    workflowFileName: {{ .firmwareRepository.workflowFileName }}
+  serialNumbers:
+    {{- with .devices }}
+    {{- range .serialNumbers }}
+    - "{{ . }}"
+    {{- end }}
+    {{- end }}
+  uartSpec:
+    baudRate: {{ .devices.microcontrollerSpec.baudRate }}
+  sensors:
+    {{- range .devices.microcontrollerSpec.sensors }}
+    - sensor: "{{ .sensor }}"
+      id: {{ .id }}
+      {{- $sensorName := .sensor }}
+      {{- range $.Values.sensors }}
+        {{- if eq $sensorName .sensor }}
+      type: "{{ .type }}"
+      unit: "{{ .unit }}"
+      fields:
+        {{- range .fields }}
+        - name: "{{ .name }}"
+          type: {{ .type }}
+        {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+  cloudMqttBroker:
+    name: {{ $.Values.cloudMqttBroker.name }}
+    port: {{ $.Values.cloudMqttBroker.port }}
+{{- end }}
+
+
+
+
+
+  #   - sensor: "ADXL345"
+  #     type: "accelerometer"
+  #     unit: "m/s^2"
+  #     id: 1
+  #     fields:
+  #       - name: "x"
+  #         type: int16
+  #       - name: "y"
+  #         type: int16
+  #       - name: "z"
+  #         type: int16
+  # cloudMqttBroker:
+  #   name: "mosquitto"
+  #   port: 1883

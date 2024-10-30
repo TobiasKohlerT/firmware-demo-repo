@@ -1,0 +1,110 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.13.0
+  name: datapipelines.datapipeline.datapipeline.io
+spec:
+  group: datapipeline.datapipeline.io
+  names:
+    kind: DataPipeline
+    listKind: DataPipelineList
+    plural: datapipelines
+    singular: datapipeline
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: DataPipeline is the Schema for the datapipelines API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: DataPipelineSpec defines the desired state of DataPipeline
+            properties:
+              dataTransportSpec:
+                description: Foo is an example field of DataPipeline. Edit datapipeline_types.go
+                  to remove/update
+                properties:
+                  mqtt:
+                    properties:
+                      config:
+                        items:
+                          properties:
+                            value:
+                              type: string
+                            variable:
+                              type: string
+                          type: object
+                        type: array
+                      host:
+                        type: string
+                      port:
+                        format: int64
+                        type: integer
+                    type: object
+                type: object
+              processorSpec:
+                properties:
+                  telegraf:
+                    properties:
+                      batchSize:
+                        format: int64
+                        type: integer
+                      bufferLimit:
+                        format: int64
+                        type: integer
+                      configName:
+                        type: string
+                      hostname:
+                        type: string
+                      interval:
+                        type: string
+                    type: object
+                type: object
+              storageSpec:
+                properties:
+                  influxdb:
+                    properties:
+                      bucket:
+                        type: string
+                      createDevDb:
+                        type: boolean
+                      host:
+                        type: string
+                      org:
+                        type: string
+                      password:
+                        type: string
+                      port:
+                        format: int64
+                        type: integer
+                      storageSize:
+                        type: string
+                      token:
+                        type: string
+                      username:
+                        type: string
+                    type: object
+                type: object
+            type: object
+          status:
+            description: DataPipelineStatus defines the observed state of DataPipeline
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

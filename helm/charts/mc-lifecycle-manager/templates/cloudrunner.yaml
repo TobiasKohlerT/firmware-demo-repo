@@ -1,0 +1,42 @@
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: RunnerDeployment
+metadata:
+  name: {{ .Release.Name }}-runnerdeployment
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- range .Values.deviceGroups }}
+    devicegroup/{{ .deviceGroupName }}: "{{ .label }}"
+    {{- end }}
+spec:
+  replicas: {{ .Values.cloudRunner.replicaCount}}
+  template:
+    metadata:
+      labels:
+        app: runner
+    spec:
+      repository: TobiasKohlerT/datapipeline-operator
+      labels:
+        {{- range .Values.deviceGroups }}
+        - "{{ .deviceGroupName }}"
+        {{- end }}
+      env:
+        - name: RUNNER_FEATURE_FLAG_EPHEMERAL
+          value: "true"
+      image: summerwind/actions-runner-dind
+      dockerEnabled: false
+      dockerdWithinRunnerContainer: false
+      volumes:
+        {{ range .Values.deviceGroups }}
+        - name: {{ .deviceGroupName }}-runner-config
+          configMap:
+            name: {{ .deviceGroupName }}-runner-config
+        {{- end }}
+      containers:
+        - name: runner
+          image: summerwind/actions-runner-dind
+          volumeMounts:
+            {{ range .Values.deviceGroups }}
+            - name: {{ .deviceGroupName }}-runner-config
+              mountPath: /etc/runner/config/{{ .deviceGroupName }}/config.json
+              subPath: config.json
+            {{- end }}

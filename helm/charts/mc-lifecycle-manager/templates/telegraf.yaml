@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-telegraf-deployment
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: telegraf
+  template:
+    metadata:
+      labels:
+        app: telegraf
+    spec:
+      #serviceAccount: cthulhu
+      volumes:
+      - name: config
+        configMap:
+          name: {{ .Release.Name }}-telegraf-config
+      containers:
+      - name: telegraf
+        image: telegraf:alpine
+        imagePullPolicy: IfNotPresent
+        args:
+          - "--watch-config"
+          - "poll"
+        volumeMounts:
+        - name: config
+          mountPath: /etc/telegraf/telegraf.conf
+          subPath: telegraf.conf   
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-telegraf-config
+  namespace: {{ .Values.namespace }}
+data:
+  telegraf.conf: | 
+    [agent]
+
+      interval            = "10s"
+      round_interval      = true
+      metric_batch_size   = 1000
+      metric_buffer_limit = 10000
+      collection_jitter   = "0s"
+      flush_interval      = "10s"
+      flush_jitter        = "0s"
+      precision           = ""
+      debug               = true
+      quiet               = false
+      logfile             = ""
+      hostname            = "telegraf"
+      omit_hostname       = false
+
+    [[outputs.influxdb_v2]]
+      urls         = ["{{ .Values.telegraf.influxdb.url }}"]
+
+      organization = "{{ .Values.telegraf.influxdb.organization }}"
+      bucket       = "{{ .Values.telegraf.influxdb.bucket }}"
+      token        = "{{ .Values.telegraf.influxdb.token }}"
+
+    [[inputs.mqtt_consumer]]  
+        servers = ["tcp://{{ .Values.cloudMqttBroker.name }}.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.cloudMqttBroker.service.port | toString}}"]
+        topics = [
+            "/deviceGroup/#",
+        ]
+        #topic_tag = "mqtt_topic"
+        tagexclude = ["host", "topic"]
+        data_format = "json_v2"
+        [[inputs.mqtt_consumer.json_v2]]
+        [[inputs.mqtt_consumer.json_v2.object]]
+            path = "fields"
+        [[inputs.mqtt_consumer.json_v2.tag]]
+            path = "unit"
+            rename = "unit"
+
+        [[inputs.mqtt_consumer.topic_parsing]]
+            topic = "/deviceGroup/#"
+            measurement = "/_/_/_/measurement/_"
+            tags = "/deviceGroup/_/serial/_/sensodId"
+
+
+
+# {{- range $topic := $.Values.deviceGroups }}
+# "/deviceGroup/#",
+# {{- end }}
+#Lr3wzu8PaG_CYAP4s5Lt32PwQU9Wu05AQ7dgt_t3We6A534aagCoC9B6jPfh-4gvbBJfD4959hZtQq_fklNyLA==

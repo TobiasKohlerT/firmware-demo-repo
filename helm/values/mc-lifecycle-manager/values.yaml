@@ -1,0 +1,83 @@
+# Default values for mc-lifecycle-manager.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+namespace: "test"
+
+sensors:
+  - sensor: "ADXL345"
+    type: "accelerometer"
+    unit: "m/s^2"
+    fields:
+      - name: "x"
+        type: int16
+      - name: "y"
+        type: int16
+      - name: "z"
+        type: int16
+  - sensor: "BMP180"
+    type: "barometer"
+    unit: "Pa"
+    fields:
+      - name: "pressure"
+        type: int32
+  - sensor: "DHT22"
+    type: "temperature"
+    unit: "C"
+    fields:
+      - name: "temperature"
+        type: int16
+
+
+deviceGroups:
+  - deviceGroupName: "device-group"
+    label: "label"
+    firmwareRepository:
+      owner: "TobiasKohlerT"
+      repoName: "datapipeline-operator"
+      accessToken: "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"
+      workflowName: "DeviceGroupCI"
+      workflowFileName: "devicegroup-ci.yaml"
+    devices:
+      serialNumbers:
+        - "066AFF34314B4E3043073352"
+        - "066FFF545351857087113811"
+      microcontrollerSpec:
+        deviceName: "stm32-nucleo"
+        vendorId: "0483"
+        productId: "374b"
+        baudRate: 9600
+        sensors:
+          - sensor: "ADXL345"
+            id: 1
+          - sensor: "BMP180"
+            id: 2
+
+telegraf:
+  influxdb:
+    url: "http://influxdb-influxdb2.default.svc.cluster.local:80"
+    organization: "influxdata" 
+    bucket: "default"
+    token: "mWggXbm3cvaOvg3TVz7S6tbPXoO0LU1AVqnYOHSCz8_vjkk6isJ8Bsrx5ss5a9ZtImXbikG6magaLA_rDXpifw=="
+
+
+cloudMqttBroker:
+  name: "mosquitto"
+  port: 1884
+  service:
+    port: 1884
+
+cloudRunner:
+  name: "cloud-runner"
+  replicaCount: 1
+
+
+operator:
+  namePrefix: "datapipeline-operator-"
+  namespace: "datapipeline-operator-system"
